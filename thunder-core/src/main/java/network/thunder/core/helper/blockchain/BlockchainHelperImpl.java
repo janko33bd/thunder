@@ -6,10 +6,10 @@ import org.bitcoinj.core.*;
 import org.bitcoinj.net.discovery.DnsDiscovery;
 import org.bitcoinj.store.BlockStore;
 import org.bitcoinj.store.BlockStoreException;
-import org.bitcoinj.store.MemoryBlockStore;
-import org.bitcoinj.store.SPVBlockStore;
+import org.bitcoinj.store.FullPrunedBlockStore;
 import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.WalletTransaction;
+import org.blackcoinj.store.KofemeFullPrunedBlockstore;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class BlockchainHelperImpl implements BlockchainHelper {
 
     PeerGroup peerGroup;
-    BlockStore blockStore;
+    FullPrunedBlockStore blockStore;
     BlockChain blockChain;
 
     Set<Sha256Hash> processedMessages = new HashSet<>();
@@ -96,9 +96,9 @@ public class BlockchainHelperImpl implements BlockchainHelper {
         synchronized (initialized) {
             if (!initialized) {
                 try {
-                    blockStore = new SPVBlockStore(Constants.getNetwork(), new File("blockheaders"));
+                    blockStore = new KofemeFullPrunedBlockstore(Constants.getNetwork(), new File("blockheaders").getPath());
                 } catch (Exception e) {
-                    blockStore = new MemoryBlockStore(Constants.getNetwork());
+                    
                 }
 
                 try {
@@ -148,7 +148,7 @@ public class BlockchainHelperImpl implements BlockchainHelper {
         }
 
         @Override
-        public void onBlocksDownloaded (Peer peer, Block block, @Nullable FilteredBlock filteredBlock, int blocksLeft) {
+        public void onBlocksDownloaded (Peer peer, Block block, int blocksLeft) {
 
         }
 
